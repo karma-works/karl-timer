@@ -44,3 +44,11 @@ Falls Fehlermeldungen bezüglich fehlender Header erscheinen, stellen Sie sicher
 ```bash
 xcode-select --install
 ```
+
+## Fehlerbehebung (Linux)
+Falls beim Kompilieren Fehler wie `Package gl was not found` oder `fatal error: X11/Xlib.h: No such file or directory` auftreten, fehlen die notwendigen Entwicklungs-Bibliotheken. Auf Debian/Ubuntu-basierten Systemen können diese wie folgt installiert werden:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libxxf86vm-dev
+```

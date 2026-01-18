@@ -33,9 +33,8 @@ func main() {
 
 	state := &timerState{}
 
-	// Create the large timer label
-	label := canvas.NewText("00:00:00", theme.ForegroundColor())
-	label.TextSize = 240
+	// Create the large timer label using a widget for better thread safety
+	label := widget.NewLabel("00:00:00")
 	label.Alignment = fyne.TextAlignCenter
 	label.TextStyle = fyne.TextStyle{Bold: true}
 
@@ -50,9 +49,7 @@ func main() {
 				currentElapsed := state.lastSaved + time.Since(state.start)
 				newText := formatDuration(currentElapsed)
 				if label.Text != newText {
-					label.Text = newText
-					// Schedule refresh on the main thread to avoid console warnings
-					myApp.Driver().CanvasForObject(label).Refresh(label)
+					label.SetText(newText)
 				}
 			}
 		}
@@ -80,8 +77,7 @@ func main() {
 		state.running = false
 		state.lastSaved = 0
 		state.elapsed = 0
-		label.Text = "00:00:00"
-		label.Refresh()
+		label.SetText("00:00:00")
 	}
 
 	// Handle Mouse Click
@@ -109,8 +105,22 @@ func main() {
 	finalContent := container.NewStack(bgButton, container.NewCenter(content))
 	myWindow.SetContent(finalContent)
 
+	// Apply custom theme to increase text size
+	myApp.Settings().SetTheme(&customTheme{Theme: theme.DefaultTheme()})
+
 	myWindow.SetFullScreen(true)
 	myWindow.ShowAndRun()
+}
+
+type customTheme struct {
+	fyne.Theme
+}
+
+func (m *customTheme) Size(n fyne.ThemeSizeName) float32 {
+	if n == theme.SizeNameText {
+		return 240
+	}
+	return m.Theme.Size(n)
 }
 
 // Custom widget to capture taps on the entire window area
